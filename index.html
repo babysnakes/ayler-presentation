@@ -31,36 +31,373 @@
 
     <div class="reveal">
 
-      <!-- Any section element inside of this container is displayed as a slide -->
       <div class="slides">
+
         <section>
-          <h2>First Slide</h2>
+          <h2>Ayler - A simple Namespace Browser</h2>
+          <p>Notes from my (almost) first clojure project.</p>
+        </section>
+
+        <section>
+          <h2>About Me</h2>
+          <ul>
+            <li>Operations consultant.</li>
+            <li>Doing some development on my (very limited) spare time.</li>
+          </ul>
         </section>
 
         <section>
           <section>
-            <h2>Second Slide</h2>
+            <h2>Ayler</h2>
+            <img src="images/main-screen.png" />
+            <a href="http://github.com/babysnakes/ayler">http://github.com/babysnakes/ayler</a>
           </section>
 
           <section>
-            <h3>Nested Slide</h3>
-            <p>Nested slide content</p>
-
+            <h2>What is Ayler?</h2>
+            <ul>
+              <li class="fragment">Namespace browser for your project.</li>
+              <li class="fragment">
+                Connects to your project via <i>nrepl</i>.
+              </li>
+              <li class="fragment">
+                Requires minimal (or no) dependencies in your project.
+              </li>
+              <li class="fragment">
+                Displays all the loaded namespaces.
+              </li>
+              <li class="fragment">
+                Displays all public members of a selected namespace.
+              </li>
+              <li class="fragment">
+                Displays docstring and source of selected var.
+              </li>
+              <li class="fragment">
+                Allows you to search and load any namespace from a
+                list of all namespaces in your classpath (requires 2
+                dependencies).
+              </li>
+            </ul>
             <aside class="notes">
-              <p>This is a note for the second slide</p>
               <ul>
-                <li>point 1</li>
-                <li>point 2</li>
+                <li>minimal dependencies</li>
+                <li>works with any project that uses nrepl</li>
               </ul>
             </aside>
+          </section>
 
+          <section>
+            <h2>Demo</h2>
           </section>
         </section>
 
         <section>
-          <h2>Last slide</h2>
+          <h2>Agenda</h2>
+          <ul>
+            <li class="fragment">Inspiration</li>
+            <li class="fragment">Motivation</li>
+            <li class="fragment">State</li>
+            <li class="fragment">Workflow</li>
+            <li class="fragment">Macros</li>
+            <li class="fragment">Mistakes</li>
+          </ul>
+          <aside class="notes">
+            <p>what are my take aways from the project?</p>
+            <p>Don't forget to mention:</p>
+            <ul>
+              <li>Javascript is pretty nice</li>
+              <li>Angularjs is pretty nice</li>
+            </ul>
+          </aside>
         </section>
 
+        <section>
+          <h2>This is a conversation!</h2>
+          <aside class="notes">
+            This is meant to be a conversation. I'm noob at all of
+            this. I only have experience in small projects and I would
+            like to hear your input (especially in the state section).
+          </aside>
+        </section>
+
+        <section>
+          <section>
+            <h2>Inspiration</h2>
+          </section>
+          <section>
+            <h2>labrepl</h2>
+            <ul>
+              <li class="fragment">
+                A set of tutorials by
+                <a href="https://github.com/relevance/labrepl">Relevance</a>
+              </li>
+              <li class="fragment">One of the tutorials is a namespace browser</li>
+              <li class="fragment">In process</li>
+              <li class="fragment">Very basic set of features</li>
+              <li class="fragment">Nice web interface</li>
+            </ul>
+            <aside class="notes">
+              This was where I started to look for such a solution. I
+              borrowed the layout concept from this.
+            </aside>
+          </section>
+
+          <section>
+            <h2>cljs-ns-browser</h2>
+            <img src="images/clj-ns-browser.png"/>
+            <ul>
+              <li class="fragment">In process</li>
+              <li class="fragment">
+                Many dependencies (version clashes with project
+                dependencies)
+              </li>
+              <li class="fragment">Desktop application (swing)</li>
+              <li class="fragment">Many features</li>
+            </ul>
+            <aside class="notes">
+              Searching for a better implementation of the namespace
+              browser I found
+              <a href="https://github.com/franks42/clj-ns-browser">
+                clj-ns-btowser</a>.
+              I had to run it in separate repl because of the many
+              version clashes with my project.
+            </aside>
+          </section>
+        </section>
+
+        <section>
+          <h2>Motivation</h2>
+          <ul>
+            <li class="fragment">
+              Avoid always browsing github project files or api
+              docs to see what is available in a library
+            </li>
+            <li class="fragment">
+              A nice project to learn clojure and (later) clojurescript
+            </li>
+            <li class="fragment">Web interface</li>
+            <li class="fragment">No (or little) dependencies</li>
+            <li class="fragment">External to your project</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Ayler uses</h2>
+          <ul>
+            <li class="fragment">Clojure web stack:</li>
+            <ul>
+              <li class="fragment">Ring</li>
+              <li class="fragment">Compjure</li>
+              <li class="fragment">Ring-json</li>
+              <li class="fragment">http-kit</li>
+            </ul>
+            <li class="fragment">Nrepl (connects to project)</li>
+            <li class="fragment">AngularJS single page application</li>
+            <li class="fragment">CLI Utilities</li>
+          </ul>
+          <aside class="notes">
+            First project using angularjs and JavaScript. Liked them both.
+          </aside>
+        </section>
+
+        <section>
+          <section>
+            <h2>Workflow</h2>
+            <ul>
+              <li class="fragment">Reload on changes</li>
+              <li class="fragment">Running test after changes</li>
+            </ul>
+            <aside class="notes">
+              e.g. what happens when deleting or renaming a function. It
+              still part of the namespace until I restart the JVM.
+            </aside>
+          </section>
+          <section>
+            <h2>Workflow (old)</h2>
+            <ul>
+              <li class="fragment">
+                <span class="fragment fade-out">lein-ring</span>
+              </li>
+              <li class="fragment">
+                Reload routes on every request:
+                <pre><code data-trim>
+(defmacro var-route
+  [route]
+  (if (development?)
+    `(var ~route)
+    route))
+                </code></pre>
+              </li>
+              <li class="fragment">Load every change to the nrepl (C-c C-l)</li>
+              <li class="fragment">
+                Run tests in repl
+                <span class="fragment">
+                  - This may cause invalid test results (e.g. a
+                  function may be deleted but it's still in the repl
+                  namespace).
+                </span>
+              </li>
+              <li class="fragment">
+                Once in a while (or when something seems suspicious)
+                run <code>lein test</code> from a shell.
+              </li>
+            </ul>
+            <aside class="notes">
+              Since I'm constantly changing function names I found
+              myself running <code>lein test</code> constantly.
+            </aside>
+          </section>
+        </section>
+        <section>
+          <section>
+          <h2>Stuart Sierra's workflow</h2>
+          As described in the famous
+          <a href="http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded">
+          blog post</a>.
+          </section>
+          <section>
+            <h2>The System Constructor</h2>
+            <p>
+              The only global variable in the application. Should
+              hold <b>all</b> the data in the application.
+            </p>
+            <pre><code>
+(defn system
+  "Returns a new instance of the application."
+  []
+  {:settings {:port 5000}})
+            </code></pre>
+            <pre><code>
+(defn init
+  "Construct development env."
+  []
+  (alter-var-root #'system
+    (constantly (-> (app/system)
+                    (assoc :remote [6001 "localhost"])))))
+            </code></pre>
+            <aside class="notes">
+              <i>system</i> can accept parameters.
+            </aside>
+          </section>
+          <section>
+            <h2>Start/Stop the system</h2>
+            <pre><code>
+(defn start
+  "Start all components of the application. Returns the updates system."
+  [system]
+  (when-let [level (:log-level system)]
+    (timbre/set-level! level))
+  (when-let [remote (:remote system)]
+    (apply client/set-remote remote))
+  (let [server (run-server app (:settings system))]
+    (timbre/info (str "Ayler started on port " (get-in system [:settings :port])))
+    (assoc system :stop-server-fn server)))
+            </code></pre>
+            <pre><code>
+(defn stop
+  "Stops all components of the application. Returns the updated system."
+  [system]
+  (if-let [stop-server-fn (:stop-server-fn system)]
+    (stop-server-fn))
+  (assoc system :remote (client/extract-remote)))
+            </code></pre>
+            <aside class="notes">
+              <ul>
+                <li>start:</li>
+                <ul>
+                  <li>setting log level</li>
+                  <li>
+                    setting remote port. The remote port is actually a
+                    global variable which breaks the pattern discussed
+                    above, but it seems to work because we read it on
+                    stop and set it on start.
+                  </li>
+                  <li>setting the stop-server function in the system</li>
+                </ul>
+                <li>stop:</li>
+                <ul>
+                  <li>stops the server if the function exists</li>
+                  <li>saves the remote port</li>
+                </ul>
+              </ul>
+            </aside>
+          </section>
+          <section>
+            <h2>Dev Profile</h2>
+            <pre><code>
+:profiles {:dev {:source-paths ["src/dev"]
+                 :dependencies [[ring-mock "0.1.5"]
+                                [org.clojure/tools.namespace "0.2.4"]
+                                [org.clojure/java.classpath "0.2.1"]]}
+            </code></pre>
+            <pre><code>
+(ns user
+  (:require [ayler.app :as app]
+            ...
+            [clojure.tools.namespace.find :refer (find-namespaces-in-dir)]))
+
+(def system nil)
+
+(defn init
+  ...)
+
+(defn start
+  ...)
+
+(defn stop
+  ...)
+
+(defn go
+  "Initialize and run"
+  []
+  (init)
+  (start))
+
+(defn reset []
+  (stop)
+  (refresh :after 'user/go))
+
+(defn run-all-tests
+  ...)
+            </code></pre>
+            <aside class="notes">
+              If this file has an error the repl fails to start. Can
+              workaround by just calling a different namespace which
+              contains all these methods.
+            </aside>
+          </section>
+          <section>
+            <h2>Workflow</h2>
+            <ul>
+              <li class="fragment">
+                Resetting the environment after every change
+              </li>
+              <li class="fragment">
+                Running tests only in repl (no need for <code>lein
+                repl</code>)
+              </li>
+              <li class="fragment">
+                Sometimes full VM reset is required
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h2>Gotchas</h2>
+            <ul>
+              <li class="fragment">Not setting the system correctly</li>
+              <li class="fragment">AOT</li>
+              <li class="fragment">
+                Problems in <code>user.clj</code> prevents the repl
+                from loading.
+              </li>
+              <li class="fragment">
+                Check the blog and the README in
+                the <i>tools.namespace</i> repository for problems and
+                possible solutions.
+              </li>
+            </ul>
+          </section>
+        </section>
       </div>
     </div>
 

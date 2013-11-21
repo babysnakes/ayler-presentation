@@ -78,6 +78,7 @@
                 dependencies).
               </li>
             </ul>
+            <p class="fragment">~</p>
             <aside class="notes">
               <ul>
                 <li>minimal dependencies</li>
@@ -96,11 +97,14 @@
           <ul>
             <li class="fragment">Inspiration</li>
             <li class="fragment">Motivation</li>
-            <li class="fragment">State</li>
             <li class="fragment">Workflow</li>
-            <li class="fragment">Macros</li>
-            <li class="fragment">Mistakes</li>
+            <li class="fragment">Error handling</li>
+            <li class="fragment">State</li>
+            <li class="fragment">Testing</li>
+            <li class="fragment">Javascript</li>
+            <li class="fragment">Genera Lessons</li>
           </ul>
+          <p class="fragment">~</p>
           <aside class="notes">
             <p>what are my take aways from the project?</p>
             <p>Don't forget to mention:</p>
@@ -136,6 +140,7 @@
               <li class="fragment">Very basic set of features</li>
               <li class="fragment">Nice web interface</li>
             </ul>
+            <p class="fragment">~</p>
             <aside class="notes">
               This was where I started to look for such a solution. I
               borrowed the layout concept from this.
@@ -154,6 +159,7 @@
               <li class="fragment">Desktop application (swing)</li>
               <li class="fragment">Many features</li>
             </ul>
+            <p class="fragment">~</p>
             <aside class="notes">
               Searching for a better implementation of the namespace
               browser I found
@@ -179,6 +185,7 @@
             <li class="fragment">No (or little) dependencies</li>
             <li class="fragment">External to your project</li>
           </ul>
+          <p class="fragment">~</p>
         </section>
 
         <section>
@@ -195,6 +202,7 @@
             <li class="fragment">AngularJS single page application</li>
             <li class="fragment">CLI Utilities</li>
           </ul>
+          <p class="fragment">~</p>
           <aside class="notes">
             First project using angularjs and JavaScript. Liked them both.
           </aside>
@@ -207,6 +215,7 @@
               <li class="fragment">Reload on changes</li>
               <li class="fragment">Running test after changes</li>
             </ul>
+            <p class="fragment">~</p>
             <aside class="notes">
               e.g. what happens when deleting or renaming a function. It
               still part of the namespace until I restart the JVM.
@@ -242,6 +251,7 @@
                 run <code>lein test</code> from a shell.
               </li>
             </ul>
+            <p class="fragment">~</p>
             <aside class="notes">
               Since I'm constantly changing function names I found
               myself running <code>lein test</code> constantly.
@@ -380,6 +390,7 @@
                 Sometimes full VM reset is required
               </li>
             </ul>
+            <p class="fragment">~</p>
           </section>
           <section>
             <h2>Gotchas</h2>
@@ -396,7 +407,267 @@
                 possible solutions.
               </li>
             </ul>
+            <p class="fragment">~</p>
           </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>Error handling</h2>
+            <p class="fragment">Hardly ever use exceptions</p>
+            <p class="fragment">Indicate errors with data structures</p>
+            <pre class="fragment"><code>
+(defn eval-on-remote-nrepl
+  "Evaluates the op and code on the remote nrepl.
+  ..."
+  [op code]
+  (if (empty? @_remote)
+    {:status :not-connected}
+    (try
+      #_(...)
+      (with-open [conn (apply repl/connect @_remote)]
+        #_(...))
+      (catch java.net.ConnectException e
+        (do #_(...)
+            {:status :disconnected})))))
+            </code></pre>
+          </section>
+          <section>
+            <h2>Other Error Handling Concepts</h2>
+            <ul>
+              <li class="fragment">
+                Conditional restarts -
+                <a href="https://github.com/zcaudate/ribol">ribol</a>,
+                <a href="https://github.com/hugoduncan/swell">swell</a>
+              </li>
+              <li class="fragment">
+                Supervisor style -
+                <a href="https://github.com/MichaelDrogalis/dire">dire</a>
+              </li>
+            </ul>
+            <p class="fragment">~</p>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>State</h2>
+            <aside class="notes">
+              This is where your participation is most important.
+            </aside>
+          </section>
+          <section>
+            <p><a href="https://github.com/sjl/caves">
+                The Caves of Clojure
+            </a></p>
+            <aside class="notes">
+              A tutorial for creating nethack like games. It's *world*
+              data structure easily becomes confusing.
+            </aside>
+          </section>
+          <section>
+            <h2>Ayler (things are simpler)</h2>
+            <p class="fragment">State is usually in the database or session</p>
+            <p class="fragment">Every layer is in charge of it's own state</p>
+            <p class="fragment"> Nearly all of the functions are pure</p>
+            <p class="fragment">
+              In every layer there's a few <i>messy</i> functions that
+              collect all the required state.
+            </p>
+            <p class="fragment">~</p>
+            <aside class="notes">
+              "functional core imperative shell"
+            </aside>
+          </section>
+          <section>
+            <code>nrepl-client.clj</code>
+            <pre><code>
+(defonce ^:private _remote (atom []))
+
+;; ... getter and setter
+            </code></pre>
+            <aside class="notes">
+              <ul>
+                <li>defonce because I sometimes load file without resetting.</li>
+                <li>should I use thread local vars? - I left it as
+                var because It rarely changes.</li>
+              </ul>
+            </aside>
+          </section>
+          <section>
+            <code>api.clj</code>
+            <pre><code>
+(defn- var-doc
+  "Returns the docstring of a fully qualified var name"
+  [namespace var]
+  (->  (construct-varname namespace var)
+       (queries/query-docstring)))
+            </code></pre>
+            <pre><code>
+(defroutes routes
+  #_(...)
+  (GET "/api/doc/:namespace/:var" [namespace var]
+       (response (var-doc namespace var)))
+  #_(...))
+            </code></pre>
+            <aside class="notes">
+              Although this is not much of an example, think of the
+              construct-varname method as verifying input and fetching
+              user from database and only then it is passed to the
+              function that does something with it (purely).
+            </aside>
+          </section>
+          <section>
+            <p>
+              Stuart Sierra -
+              <a href="http://www.infoq.com/presentations/Clojure-Large-scale-patterns-techniques">
+              Clojure in the Large</a>
+            </p>
+            <aside class="notes">
+              He returns to the big data structure pattern. Also
+              discuss about the possibility of holding transaction in
+              data structures (barybernhardt), etc...
+              <p>Input anybody?</p>
+            </aside>
+          </section>
+        </section>
+
+        <section>
+          <h2>Testing</h2>
+          <p class="fragment">Test only the pure methods</p>
+          <p class="fragment">
+            Rely on the fact that the non-pure methods
+            are <b>really</b> simple
+          </p>
+          <p class="fragment"> About 0.5 to 1 test/code ratio </p>
+          <p class="fragment">
+            Compared to 1 to 1 javascript test/code ratio
+          </p>
+          <p class="fragment">Integration tests</p>
+          <p class="fragment">~</p>
+          <aside class="notes">
+            Talk about the difference from ruby testing religion.
+            compared to 5/1 test/code ratio in my first rails app.
+          </aside>
+        </section>
+
+        <section>
+          <section>
+          <h2>JavaScript</h2>
+          <aside class="notes">
+            This is my first javascript project (I wrote 100 lines of
+            coffeescript in the past). Nice language.
+          </aside>
+          </section>
+          <section>
+            <h2>AngularJS</h2>
+            <aside class="notes">
+              Enable functional composition.
+            </aside>
+          </section>
+          <section>
+            <h2>JSON</h2>
+            <p class="fragment">
+              Ring-json (There are more fully featured solutions
+              - liberator)
+            </p>
+            <pre class="fragment"><code>
+(defroutes routes
+  #_(...)
+  (POST "/api/disconnect/" _ (response (client/disconnect))))
+
+(def app
+  (-> routes
+      wrap-json-response
+      wrap-json-params))
+            </code></pre>
+            <p class="fragment">
+              Protection against CSRF with customized
+              <code>ring-anti-forgery</code> (submitted PR)
+            </p>
+            <p class="fragment">~</p>
+            <aside class="notes">
+              On POST the params are shown as regular params.
+            </aside>
+          </section>
+          <section>
+            <h2>JSON 2</h2>
+            <pre class="fragment"><code>
+{
+    "status": "done",
+    "response": "([x])\n  Returns a number one greater than num. Does not auto-promote\n  longs, will throw on overflow. See also: inc'"
+}
+            </code></pre>
+            <pre class="fragment"><code>
+{
+    "status": "error",
+    "response": "IllegalArgumentException No such namespace: clojure.coree  clojure.lang.Var.find (Var.java:153)\n"
+}
+            </code></pre>
+            <p class="fragment">~</p>
+            <aside class="notes">
+              The error is the direct response from nrepl.
+            </aside>
+          </section>
+          <section>
+            <h2>JSON 3</h2>
+            <pre><code>
+apiClient.handleResponse = function(response, handler) {
+  switch(response.status) {
+  case "disconnected":
+    $rootScope.$broadcast("connect", {disconnected: true});
+  case "not-connected":
+    $rootScope.$broadcast("connect");
+  case "done":
+    handler(response.response);
+    break;
+  case "error":
+    apiClient.handleError(response.response);
+    break;
+  default:
+    alert("Unknown response: " + response);
+    break;
+  };
+};
+            </code></pre>
+            <aside class="notes">
+              Parsing responses.
+            </aside>
+          </section>
+        </section>
+
+        <section>
+          <section>
+            <h2>General Lessons</h2>
+            <aside class="notes">
+              Some general take aways from this project. FREE FORM.
+            </aside>
+          </section>
+          <section>
+            <h2>OO vs Functional</h2>
+            <aside class="notes">
+              Never really understood OO. Functional makes more sense
+              to me (although starting is hard).
+              <ul>
+                <li>Composition is much better hierarchy</li>
+                <li>
+                  I managed to contribute significant code to 2
+                  *functional* projects (clojure-mode, ring-csrf).
+                </li>
+              </ul>
+            </aside>
+          </section>
+          <section>
+            <h2>Project Layout</h2>
+            <aside class="notes">
+              Separate the html client from the server.
+            </aside>
+          </section>
+        </section>
+
+        <section>
+          <h1>THANK YOU</h1>
+          <p>Questions?</p>
         </section>
       </div>
     </div>
